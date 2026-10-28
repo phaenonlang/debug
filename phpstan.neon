@@ -1,0 +1,13 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        # The tests exercise check() on values whose type is known to the test.
+        -
+            identifier: method.alreadyNarrowedType
+            path: tests/*
+        -
+            identifier: method.impossibleType
+            path: tests/*

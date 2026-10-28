@@ -1,0 +1,33 @@
+{
+    "name": "phaenon/runtime",
+    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind reified type parameters and `is` / `as`",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["phaenon", "generics", "runtime", "types"],
+    "homepage": "https://phaenon.dev",
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0",
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phaenon\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Phaenon\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "stan": "phpstan analyse"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
