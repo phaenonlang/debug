@@ -170,6 +170,6 @@ final class TypeTest extends TestCase
     public function literalRejectsObjects(): void
     {
         $this->expectException(LogicException::class);
-        Type::literal(new \stdClass());
+        Type::literal(new \stdClass()); // @phpstan-ignore argument.type, argument.templateType
     }
 }

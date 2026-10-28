@@ -228,7 +228,8 @@ final class Type implements \Stringable
      */
     public static function literal(mixed $value): self
     {
-        if (!is_scalar($value) && !$value instanceof UnitEnum) {
+        // Callers without static types reach this from plain PHP.
+        if (!is_scalar($value) && !$value instanceof UnitEnum) { // @phpstan-ignore instanceof.alwaysTrue, booleanAnd.alwaysFalse
             throw new LogicException('Only scalars and enum cases can be literal types, ' . get_debug_type($value) . ' given');
         }
         $name = match (true) {
