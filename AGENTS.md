@@ -1,8 +1,9 @@
 # phaenon/runtime — agent guide
 
 The Composer package `phaenon/runtime`: `\Phaenon\Type`, the immutable, interned type descriptor
-that code compiled from Phaenon uses for reified type parameters and for `is` / `as` on structural
-types (design: `../design/generics.md` §5.5 and §11). The map of every Phaenon repo, the working
+that code compiled from Phaenon uses for `is` / `as` on structural types (design:
+`../design/generics.md` §5.5, §11 and §11.2 — `reified` is gone, the descriptor never appears in a
+signature). The map of every Phaenon repo, the working
 method and the commit rules are in the compiler repo: read `../phaenon/AGENTS.md` first.
 
 ```sh
@@ -15,5 +16,5 @@ composer stan        # PHPStan at level max over src/ and tests/
   removing a public method breaks compiled code.
 - The compiler's checker reads a hand-kept declaration of this API,
   `../phaenon/stdlib/runtime/Type.php`. Change both together.
-- Commit messages read as human-written prose, with no attribution lines and no `Co-Authored-By`:
-  the repository will be public.
+- Commit messages say what changed and why, with no attribution lines and no `Co-Authored-By`: the
+  repository will be public.

@@ -11,8 +11,8 @@ use UnitEnum;
 /**
  * A runtime type descriptor.
  *
- * Phaenon compiles a reified type parameter to one of these, and `is` / `as`
- * on structural types (`$x is list<int>`) to its check() and assert().
+ * Phaenon compiles `is` / `as` on structural types (`$x is list<int>`), which
+ * PHP cannot test on its own, to one of these and its check() / assert().
  * Descriptors are immutable and interned: two spellings of the same type are
  * the same object, so a hot path pays a property read, not an allocation.
  *
@@ -62,19 +62,6 @@ final class Type implements \Stringable
         }
 
         return self::intern('class', $name, array_values($args));
-    }
-
-    /**
-     * Accepts what a PHP caller passes for a reified parameter: a class
-     * name or a descriptor.
-     *
-     * @template U of object
-     * @param class-string<U>|self<U> $type
-     * @return self<U>
-     */
-    public static function from(string|self $type): self
-    {
-        return $type instanceof self ? $type : self::of($type);
     }
 
     /** @return self<int> */
@@ -366,18 +353,6 @@ final class Type implements \Stringable
     public function orNull(mixed $value): mixed
     {
         return $this->check($value) ? $value : null;
-    }
-
-    /**
-     * Constructs an instance of a class type (`new T(...)`).
-     *
-     * @return T
-     */
-    public function instantiate(mixed ...$args): mixed
-    {
-        $class = $this->className();
-
-        return new $class(...$args);
     }
 
     /**

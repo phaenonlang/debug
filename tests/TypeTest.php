@@ -35,7 +35,6 @@ final class TypeTest extends TestCase
         self::assertSame(Type::int(), Type::int());
         self::assertSame(Type::list(Type::int()), Type::list(Type::int()));
         self::assertSame(Type::of(Animal::class), Type::of('\\' . Animal::class));
-        self::assertSame(Type::of(Animal::class), Type::from(Animal::class));
         self::assertSame(Type::union(Type::int(), Type::string()), Type::union(Type::int(), Type::union(Type::string(), Type::int())));
         self::assertSame(Type::int(), Type::union(Type::int(), Type::int()));
         self::assertSame(Type::nullable(Type::int()), Type::nullable(Type::nullable(Type::int())));
@@ -135,14 +134,11 @@ final class TypeTest extends TestCase
     }
 
     #[Test]
-    public function classTypesInstantiateAndName(): void
+    public function classTypesKnowTheirName(): void
     {
         $t = Type::of(Dog::class);
         self::assertSame(Dog::class, $t->className());
         self::assertSame(Dog::class, Type::of(Dog::class, Type::int())->className());
-        $dog = $t->instantiate('Rex');
-        self::assertInstanceOf(Dog::class, $dog);
-        self::assertSame('Rex', $dog->name);
         $this->expectException(LogicException::class);
         Type::int()->className();
     }
