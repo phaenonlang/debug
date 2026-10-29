@@ -16,5 +16,6 @@ composer stan        # PHPStan at level max over src/ and tests/
   removing a public method breaks compiled code.
 - The compiler's checker reads a hand-kept declaration of this API,
   `../phaenon/stdlib/runtime/Type.php`. Change both together.
-- Commit messages say what changed and why, with no attribution lines and no `Co-Authored-By`: the
-  repository will be public.
+- Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, … with a body that says
+  what changed and why), with no attribution lines and no `Co-Authored-By`: the repository will be
+  public.
