@@ -73,7 +73,12 @@ final class Str
 
     public static function indexOf(string|\Stringable $s, string $needle, int $from = 0): ?int
     {
-        $i = mb_strpos((string) $s, $needle, $from);
+        $s = (string) $s;
+        $length = mb_strlen($s);
+        if ($from > $length || $from < -$length) {
+            return null; // mb_strpos() would throw: nothing starts outside the string
+        }
+        $i = mb_strpos($s, $needle, $from);
 
         return false === $i ? null : $i;
     }
@@ -118,10 +123,16 @@ final class Str
 
     /**
      * Every key replaced by its value in one pass, longest keys first, as strtr() does.
+     *
      * @param array<string, string> $pairs
+     * @throws \ValueError when a search string is empty
      */
     public static function replaceAll(string|\Stringable $s, array $pairs): string
     {
+        if (array_key_exists('', $pairs)) {
+            throw new \ValueError('Str::replaceAll(): a search string must not be empty');
+        }
+
         return strtr((string) $s, $pairs);
     }
 

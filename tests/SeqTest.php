@@ -172,6 +172,13 @@ final class SeqTest extends TestCase
     }
 
     #[Test]
+    public function uniqueComparesStrictly(): void
+    {
+        self::assertSame([1, '1', 2], Seq::unique([1, '1', 1, '1', 2]));
+        self::assertSame(['01', 1, '1'], Seq::unique(['01', 1, '1', '01']));
+    }
+
+    #[Test]
     public function flattenRemovesOneLevel(): void
     {
         self::assertSame([1, 2, 3, 4], Seq::flatten([[1, 2], [], [3], [4]]));

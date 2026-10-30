@@ -178,8 +178,16 @@ final class Seq
      */
     public static function unique(array $xs): array
     {
+        // Strict: 1 and '1' are two values (array_unique() and array keys
+        // would merge them). The first occurrence keeps its place.
+        $seen = [];
         $out = [];
-        foreach (array_unique($xs) as $x) {
+        foreach ($xs as $x) {
+            $key = (is_int($x) ? 'i' : 's') . $x;
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
             $out[] = $x;
         }
 

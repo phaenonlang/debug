@@ -112,6 +112,16 @@ final class StrTest extends TestCase
     }
 
     #[Test]
+    public function indexOfAnswersNullForAnOffsetOutsideTheString(): void
+    {
+        self::assertNull(Str::indexOf('héllo', 'l', 5));
+        self::assertNull(Str::indexOf('héllo', 'l', 6));
+        self::assertNull(Str::indexOf('héllo', 'l', -6));
+        self::assertSame(2, Str::indexOf('héllo', 'l', -5));
+        self::assertNull(Str::indexOf('', 'a', 1));
+    }
+
+    #[Test]
     public function lastIndexOfCountsCodePointsAndReturnsNullNotFalse(): void
     {
         self::assertSame(3, Str::lastIndexOf('héllo', 'l'));
@@ -174,6 +184,13 @@ final class StrTest extends TestCase
         self::assertSame('hllo', Str::replace('héllo', 'é', ''));
         self::assertSame('', Str::replace('', 'a', 'b'));
         self::assertSame('u_42', Str::replace(new Id('u-42'), '-', '_'));
+    }
+
+    #[Test]
+    public function replaceAllRejectsAnEmptySearchString(): void
+    {
+        $this->expectException(ValueError::class);
+        Str::replaceAll('ab', ['' => 'x', 'a' => 'b']);
     }
 
     #[Test]
