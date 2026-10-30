@@ -1,16 +1,27 @@
 {
     "name": "phaenon/runtime",
-    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind reified type parameters and `is` / `as`",
+    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind `is` / `as` on structural types, and the Seq, Map, Str and Bytes classes behind Phaenon's method syntax on lists, maps, strings and bytes",
     "type": "library",
     "license": "MIT",
-    "keywords": ["phaenon", "generics", "runtime", "types"],
+    "keywords": [
+        "phaenon",
+        "generics",
+        "runtime",
+        "types",
+        "collections",
+        "strings"
+    ],
     "homepage": "https://phaenon.dev",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.3",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.0",
         "phpstan/phpstan": "^2.1"
+    },
+    "suggest": {
+        "ext-intl": "Str::graphemeLength() and Str::truncate() count grapheme clusters with the grapheme_* functions"
     },
     "autoload": {
         "psr-4": {
