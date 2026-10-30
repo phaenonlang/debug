@@ -11,3 +11,8 @@ parameters:
         -
             identifier: method.impossibleType
             path: tests/*
+        # The same for the static assertions: Seq::first([]) is null by its signature, and the
+        # test says so on purpose.
+        -
+            identifier: staticMethod.alreadyNarrowedType
+            path: tests/*
