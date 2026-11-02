@@ -1,0 +1,3 @@
+return static function (string $reason): never {
+    throw new \LogicException($reason);
+};

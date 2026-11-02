@@ -1,0 +1,24 @@
+namespace Phaenon\Tests\Debug\Fixture;
+
+final class Greeter
+{
+    fun greet(string $name): string {
+        if ($name === '') {
+            throw new \InvalidArgumentException('no name');
+        }
+
+        return "Hello, {$name}";
+    }
+
+    fun greetAll(list<string> $names): list<string> => array_map(fn (string $n): string => $this->greet($n), $names);
+
+    fun greetOrFail(string $name): string {
+        try {
+            return $this->greet($name);
+        } catch (\InvalidArgumentException $e) {
+            throw new \RuntimeException('greeting failed', 0, $e);
+        }
+    }
+
+    fun share(int $cakes, int $guests): int => intdiv($cakes, $guests);
+}
