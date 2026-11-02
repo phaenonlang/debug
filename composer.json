@@ -1,6 +1,6 @@
 {
     "name": "phaenon/runtime",
-    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind `is` / `as` on structural types, and the Seq, Map, Str and Bytes classes behind Phaenon's method syntax on lists, maps, strings and bytes",
+    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind `is` / `as` on structural types, the Seq, Map, Str and Bytes classes behind Phaenon's method syntax on lists, maps, strings and bytes, and the line map reader that points Monolog records and Sentry events at .phn source positions",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -9,7 +9,10 @@
         "runtime",
         "types",
         "collections",
-        "strings"
+        "strings",
+        "source map",
+        "monolog",
+        "sentry"
     ],
     "homepage": "https://phaenon.dev",
     "require": {
@@ -17,11 +20,15 @@
         "ext-mbstring": "*"
     },
     "require-dev": {
+        "monolog/monolog": "^3.0",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.0",
-        "phpstan/phpstan": "^2.1"
+        "sentry/sentry": "^4.0"
     },
     "suggest": {
-        "ext-intl": "Str::graphemeLength() and Str::truncate() count grapheme clusters with the grapheme_* functions"
+        "ext-intl": "Str::graphemeLength() and Str::truncate() count grapheme clusters with the grapheme_* functions",
+        "monolog/monolog": "^3.0: Phaenon\\Debug\\Monolog\\LineMapProcessor writes .phn source positions of logged exceptions",
+        "sentry/sentry": "^4.0: Phaenon\\Debug\\Sentry\\LineMapIntegration sends .phn source positions and context lines to Sentry"
     },
     "autoload": {
         "psr-4": {
