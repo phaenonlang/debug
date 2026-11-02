@@ -9,6 +9,11 @@ The Composer package `phaenon/runtime`, what code compiled from Phaenon needs at
   `string` and `bytes` values (design: `../design/collections.md` §3 and §7,
   `../design/strings.md` §2–§4 and §6). `$xs->map($f)` compiles to `Seq::map($xs, $f)`; the
   receiver comes first, callbacks last; a `bytes` value is a PHP string at runtime.
+- `\Phaenon\Debug`, used on error paths only (design: `../design/line-map.md` §3 and §4.3):
+  `LineMap` reads the line map at the end of a compiled file; `ThrowableRewriter` points a
+  throwable at its `.phn` positions in place; `Monolog\LineMapProcessor` and
+  `Sentry\LineMapIntegration` apply it to log records and Sentry events. Monolog 3 and the Sentry
+  SDK 4 are `suggest`ed and in `require-dev`, never required.
 
 The map of every Phaenon repo, the working method and the commit rules are in the compiler
 repo: read `../phaenon/AGENTS.md` first.
@@ -23,13 +28,18 @@ composer stan        # PHPStan at level max over src/ and tests/
 
 - **`src/Type.php` is hand-kept here.** The compiler's checker reads a copy of its declaration,
   `../phaenon/stdlib/runtime/Type.php`: change both together.
-- **`src/Seq.php`, `Map.php`, `Str.php` and `Bytes.php` are generated: never edit them.** The
-  compiler compiles them from its own `../phaenon/stdlib/runtime/*.phn` with
+- **`src/Seq.php`, `Map.php`, `Str.php`, `Bytes.php` and `src/Debug/` are generated: never edit
+  them.** The compiler compiles them from its own `../phaenon/stdlib/runtime/**/*.phn` with
   `phn stdlib --out src` (run in this repository), and reads those `.phn` files as its
   declaration of the API. A wrong behaviour is fixed in the `.phn` source, then regenerated;
   the compiler's test suite (`TestRuntimePackageFresh` in `internal/emit`) fails while the
   copies here are stale, and `phn stdlib --out src --check` reports the same. A bug found from
   this side is recorded as a skipped test naming it until the source is fixed.
+- **`tests/Debug/vectors.json` is a verbatim copy** of the compiler's
+  `internal/linemap/testdata/vectors.json`, the reference every line-map reader is tested
+  against; the compiler's freshness test compares the copies. Refresh it by copying, never edit
+  it here. `tests/Debug/Fixture/build/*.php` are compiled files written by hand to the D19 layout,
+  with `src/*.phn` as their sources.
 
 ## Rules
 
