@@ -7,12 +7,14 @@ declare(strict_types=1);
 namespace Phaenon;
 
 /**
- * The binary functions of the Phaenon stdlib (design/strings.md §2, §4). A
- * `bytes` value is a PHP string kept apart from text: it has no `.`, no
- * interpolation and no Str methods, and `(bytes) $raw` is how binary data
- * held in a PHP string enters the type, free at runtime. Every function
- * takes the bytes first; only text() scans. In Phaenon source these are
- * the methods of a bytes value: `$b->hex()` compiles to `Bytes::hex($b)`.
+ * The checked conversions between bytes and text (design/strings.md §2). A
+ * `bytes` value is a PHP string kept apart from text: `.` joins it only to
+ * other bytes, it has no interpolation, and `(bytes) $raw` is how binary
+ * data held in a PHP string enters the type, free at runtime, as
+ * `(string) $b` is the unchecked way back. These functions are the
+ * conversions that check their input or spell the bytes out; PHP's own
+ * functions do the rest, typed for bytes by the overlay: strlen(),
+ * substr(), hash_equals(), ord($b[$i]).
  */
 final class Bytes
 {
@@ -21,6 +23,8 @@ final class Bytes
     }
 
     /**
+     * The bytes a string of hex digits spells, either case.
+     *
      * @throws \ValueError when $hex is not an even number of hex digits
      */
     public static function fromHex(string $hex): string
@@ -34,6 +38,8 @@ final class Bytes
     }
 
     /**
+     * The bytes a base64 string encodes, padded or not.
+     *
      * @throws \ValueError when $b64 is not base64 (standard or URL-safe alphabet)
      */
     public static function fromBase64(string $b64): string
@@ -46,31 +52,18 @@ final class Bytes
         return $b;
     }
 
-    public static function length(string $b): int
-    {
-        return strlen($b);
-    }
-
-    public static function isEmpty(string $b): bool
-    {
-        return 0 === strlen($b);
-    }
-
-    public static function slice(string $b, int $start, ?int $length = null): string
-    {
-        return substr($b, $start, $length);
-    }
-
-    public static function concat(string ...$parts): string
-    {
-        return implode('', $parts);
-    }
-
+    /**
+     * The bytes as lower-case hex digits, two per byte.
+     */
     public static function hex(string $b): string
     {
         return bin2hex($b);
     }
 
+    /**
+     * The bytes in base64: the standard alphabet with padding, or the
+     * URL-safe one without it.
+     */
     public static function base64(string $b, bool $urlSafe = false): string
     {
         $s = base64_encode($b);
@@ -104,28 +97,5 @@ final class Bytes
         } finally {
             mb_substitute_character($substitute);
         }
-    }
-
-    /**
-     * Constant-time comparison, for secrets and signatures.
-     */
-    public static function equals(string $a, string $b): bool
-    {
-        return hash_equals($a, $b);
-    }
-
-    /**
-     * The byte at $i, 0–255; negative indexes count from the end.
-     *
-     * @throws \OutOfRangeException
-     */
-    public static function at(string $b, int $i): int
-    {
-        $n = strlen($b);
-        if ($i < -$n || $i >= $n) {
-            throw new \OutOfRangeException(sprintf('Bytes::at(): index %d out of range for %d bytes', $i, $n));
-        }
-
-        return ord(substr($b, $i, 1));
     }
 }

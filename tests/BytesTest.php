@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Phaenon\Tests;
 
-use OutOfRangeException;
 use Phaenon\Bytes;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -61,37 +60,6 @@ final class BytesTest extends TestCase
     {
         $this->expectException(ValueError::class);
         Bytes::fromBase64('SGVsbG8==');
-    }
-
-    #[Test]
-    public function lengthAndIsEmptyCountBytesNotCharacters(): void
-    {
-        self::assertSame(0, Bytes::length(''));
-        self::assertSame(3, Bytes::length("\x00\x01\x02"));
-        self::assertSame(2, Bytes::length("\xC3\xA9"));
-        self::assertTrue(Bytes::isEmpty(''));
-        self::assertFalse(Bytes::isEmpty("\x00"));
-    }
-
-    #[Test]
-    public function sliceFollowsSubstr(): void
-    {
-        $b = "\x00\x01\x02\x03\x04";
-        self::assertSame("\x02\x03\x04", Bytes::slice($b, 2));
-        self::assertSame("\x01\x02", Bytes::slice($b, 1, 2));
-        self::assertSame("\x03\x04", Bytes::slice($b, -2));
-        self::assertSame("\x01\x02\x03", Bytes::slice($b, 1, -1));
-        self::assertSame('', Bytes::slice($b, 5));
-        self::assertSame('', Bytes::slice('', 0, 2));
-    }
-
-    #[Test]
-    public function concatJoinsInOrder(): void
-    {
-        self::assertSame("\x01\x02\x03", Bytes::concat("\x01", "\x02\x03"));
-        self::assertSame("\x01", Bytes::concat('', "\x01", ''));
-        self::assertSame('', Bytes::concat());
-        self::assertSame('', Bytes::concat('', ''));
     }
 
     #[Test]
@@ -165,52 +133,10 @@ final class BytesTest extends TestCase
     }
 
     #[Test]
-    public function equalsComparesWholeValues(): void
-    {
-        self::assertTrue(Bytes::equals("\x00\x01", "\x00\x01"));
-        self::assertTrue(Bytes::equals('', ''));
-        self::assertFalse(Bytes::equals("\x00\x01", "\x00\x02"));
-        self::assertFalse(Bytes::equals("\x00\x01", "\x00\x01\x02"));
-        self::assertFalse(Bytes::equals('', "\x00"));
-    }
-
-    #[Test]
-    public function atReturnsTheByteValueWithNegativeIndexesFromTheEnd(): void
-    {
-        $b = "a\x00\xFF";
-        self::assertSame(97, Bytes::at($b, 0));
-        self::assertSame(0, Bytes::at($b, 1));
-        self::assertSame(255, Bytes::at($b, 2));
-        self::assertSame(255, Bytes::at($b, -1));
-        self::assertSame(97, Bytes::at($b, -3));
-    }
-
-    #[Test]
-    public function atRejectsAnIndexPastTheEnd(): void
-    {
-        $this->expectException(OutOfRangeException::class);
-        Bytes::at('abc', 3);
-    }
-
-    #[Test]
-    public function atRejectsANegativeIndexBeforeTheStart(): void
-    {
-        $this->expectException(OutOfRangeException::class);
-        Bytes::at('abc', -4);
-    }
-
-    #[Test]
-    public function atRejectsAnyIndexIntoEmptyBytes(): void
-    {
-        $this->expectException(OutOfRangeException::class);
-        Bytes::at('', 0);
-    }
-
-    #[Test]
     public function randomBytesAreBytes(): void
     {
         $raw = random_bytes(16);
-        self::assertSame(16, Bytes::length($raw));
+        self::assertSame(16, strlen($raw));
         self::assertSame(32, strlen(Bytes::hex($raw)));
         self::assertSame($raw, Bytes::fromHex(Bytes::hex($raw)));
         self::assertSame($raw, Bytes::fromBase64(Bytes::base64($raw, urlSafe: true)));
