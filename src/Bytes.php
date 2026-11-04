@@ -18,9 +18,7 @@ namespace Phaenon;
  */
 final class Bytes
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * The bytes a string of hex digits spells, either case.
@@ -52,9 +50,7 @@ final class Bytes
         return $b;
     }
 
-    /**
-     * The bytes as lower-case hex digits, two per byte.
-     */
+    /** The bytes as lower-case hex digits, two per byte. */
     public static function hex(string $b): string
     {
         return bin2hex($b);
@@ -85,9 +81,7 @@ final class Bytes
         return (string) $b;
     }
 
-    /**
-     * The bytes decoded as UTF-8 text, every invalid sequence replaced by U+FFFD.
-     */
+    /** The bytes decoded as UTF-8 text, every invalid sequence replaced by U+FFFD. */
     public static function textLossy(string $b): string
     {
         $substitute = mb_substitute_character();

@@ -43,9 +43,7 @@ final class ThrowableRewriter
      */
     private static array $properties = [];
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /** Rewrites $e and its previous chain, the throwables not rewritten before. */
     public static function rewrite(Throwable $e): void

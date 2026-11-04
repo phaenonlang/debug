@@ -56,8 +56,7 @@ final class LineMap
         private readonly array $outputs,
         private readonly array $holdEnds,
         private readonly array $sources,
-    ) {
-    }
+    ) {}
 
     /**
      * The map of a compiled file, read from its last line (or from the line
