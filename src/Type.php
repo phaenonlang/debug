@@ -334,6 +334,7 @@ final class Type implements \Stringable
     /**
      * Returns $value when it is of this type, throws a TypeError otherwise.
      *
+     * @throws TypeError when it is not
      * @return T
      */
     public function assert(mixed $value): mixed
