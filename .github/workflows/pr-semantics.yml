@@ -1,0 +1,40 @@
+# The PR-level contract (CONTRIBUTING.md, "Pull requests";
+# .github/scripts/pr-semantics.sh has the rules and their reasons): a
+# Conventional Commit title, Conventional Commits, and the title's release
+# impact equal to the highest of the commits'. Pull requests are squash-merged,
+# so the title is the commit main keeps.
+#
+# `edited` is in the trigger on purpose: retitling a PR runs the gate again.
+name: PR semantics
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-semantics-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Conventional title ↔ commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - name: PR semantics gate
+        env:
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/pr-semantics.sh
