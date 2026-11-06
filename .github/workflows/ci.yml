@@ -1,0 +1,62 @@
+# CI: every pull request into main and every push to main runs what
+# CONTRIBUTING.md asks of a change: composer.json valid for Packagist, the
+# suite green, PHPStan at level max with no errors.
+#
+# composer.lock is not committed, so `composer install` resolves the newest
+# versions the constraints allow, as a project that requires the package
+# does. The cache holds Composer's downloads, not a resolution: it is keyed
+# on the commit and restores the newest one main saved, so a dependency
+# released since is fetched and kept.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+jobs:
+  php:
+    name: PHP 8.5
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          # mbstring is the package's own requirement (Bytes::text(),
+          # Bytes::textLossy()); curl is sentry/sentry's, in require-dev.
+          extensions: mbstring, curl
+          coverage: none
+          tools: composer
+      - name: Find Composer's cache
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ github.sha }}
+          restore-keys: composer-${{ runner.os }}-
+      - name: composer validate
+        run: composer validate --strict
+      - name: composer install
+        run: composer install --no-interaction --no-progress
+      - name: composer test
+        run: composer test
+      - name: composer stan
+        run: composer stan -- --no-progress
+      - uses: actions/cache/save@v6
+        # main's caches are the ones every branch can restore.
+        if: github.event_name == 'push'
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ github.sha }}
