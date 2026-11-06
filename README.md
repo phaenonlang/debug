@@ -18,6 +18,9 @@ Two more parts are called by name, never introduced by the compiler:
   every compiled file and points logged exceptions and Sentry events at `.phn` source positions
   ([below](#phaenondebug--source-positions-in-production)).
 
+Install: `composer require phaenon/runtime` (the compiler's package, `phaenon/phn`, requires it
+already).
+
 ## Requirements
 
 PHP 8.3 or later with `ext-mbstring`, which `Bytes::text()` and `Bytes::textLossy()` use.
@@ -75,15 +78,16 @@ Bytes::textLossy("a\xFFb");                         // "a\u{FFFD}b"
 code can call it too.
 
 The package once held `Seq`, `Map` and `Str` as well, behind a method syntax on lists, maps and
-strings that Phaenon no longer has (design: `roadmap.md` D20): PHP's array functions, `mb_*`,
-`grapheme_*` and symfony/string do that work, chained with pipes.
+strings that Phaenon no longer has (design: [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md)
+D20): PHP's array functions, `mb_*`, `grapheme_*` and symfony/string do that work, chained with
+pipes.
 
 ## `Phaenon\Debug` — source positions in production
 
 PHP has no source maps: a stack trace, a warning, a log line report the line of the code that ran,
 and that is `.src/Foo.php`, not `src/Foo.phn`. So every file `phn build` compiles ends with a
 comment, its **line map**, that says which `.phn` line each line of the output came from
-(design: `line-map.md` §3):
+(design: [`line-map.md`](https://github.com/phaenonlang/design/blob/main/line-map.md) §3):
 
 ```php
 // phaenon-map v1 ../src/Domain/Foo.phn 1-6=1 7:1 15-17=9 18:9

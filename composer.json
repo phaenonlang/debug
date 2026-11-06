@@ -1,6 +1,6 @@
 {
     "name": "phaenon/runtime",
-    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind `is` / `as` on structural types, the checked conversions of \\Phaenon\\Bytes between binary data and UTF-8 text, and the line map reader that points Monolog records and Sentry events at .phn source positions",
+    "description": "Runtime support for code compiled from Phaenon: the \\Phaenon\\Type descriptor behind the is and as operators on structural types, the checked conversions of \\Phaenon\\Bytes between binary data and UTF-8 text, and the line map reader that points Monolog records and Sentry events at .phn source positions",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -14,6 +14,11 @@
         "sentry"
     ],
     "homepage": "https://phaenon.dev",
+    "support": {
+        "issues": "https://github.com/phaenonlang/runtime/issues",
+        "source": "https://github.com/phaenonlang/runtime",
+        "docs": "https://phaenon.dev"
+    },
     "require": {
         "php": ">=8.3",
         "ext-mbstring": "*"
