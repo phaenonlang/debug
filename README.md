@@ -1,17 +1,14 @@
-# phaenon/runtime
+# phaenon/debug
 
-Runtime support for [Phaenon](https://phaenon.dev), a typed dialect of PHP that compiles to PHP.
-The compiler introduces no call into this package: `is` and `as` compile to PHP's own tests —
-`$x is int` to `\is_int($x)`, `$x is list` to `\is_array($x) && \array_is_list($x)` — and a
-generic that needs its type parameter at runtime holds a `class<T>` value, a plain class-name
-string, the way PHP code does today.
+Source positions in production for code written in [Phaenon](https://phaenon.dev), a typed
+dialect of PHP that compiles to PHP. Every compiled file ends with a line map; **`Phaenon\Debug`**
+reads it and points logged exceptions and Sentry events at `.phn` source positions
+([below](#phaenondebug--source-positions-in-production)). It is opt-in and used only on error
+paths: compiled code never calls this package, and a project that does not register its
+integrations runs the same without it.
 
-What it holds is called by name: **`Phaenon\Debug`**, opt-in and used only on error paths. It
-reads the line map at the end of every compiled file and points logged exceptions and Sentry
-events at `.phn` source positions ([below](#phaenondebug--source-positions-in-production)).
-
-Install: `composer require phaenon/runtime` (the compiler's package, `phaenon/phn`, requires it
-already).
+Install: `composer require phaenon/debug`. It reads version 1 of the line map format, the one the
+compiler writes, whichever release of the compiler wrote it.
 
 ## Requirements
 
@@ -19,21 +16,38 @@ PHP 8.3 or later. `monolog/monolog` 3 and `sentry/sentry` 4 are suggested, not r
 integration in `Phaenon\Debug` loads only when the application registers it, which it does only
 with its library installed.
 
-The package once held `\Phaenon\Type` as well, the descriptor `is` and `as` compiled to on a
-type PHP cannot test itself (`$x is list<int>`). Phaenon tests only what PHP tests in O(1) now,
-and such a test is an error (design: [`generics.md`](https://github.com/phaenonlang/design/blob/main/generics.md)
-§11.4).
+## Formerly `phaenon/runtime`
 
-It held `\Phaenon\Bytes` too, the conversions between Phaenon's `bytes` and text. A `bytes` value
-is a PHP string at runtime, and the conversions are PHP's own: `$b as string` compiles to
-`\mb_check_encoding($b, 'UTF-8') ? $b : throw new \ValueError('not valid UTF-8')`, and
-`hex2bin()`, `bin2hex()`, `base64_decode()`, `base64_encode()` and `mb_scrub()` do the rest
-(design: [`strings.md`](https://github.com/phaenonlang/design/blob/main/strings.md) §6).
+This package was `phaenon/runtime` until 0.3: its last release under that name is 0.2.0, and the
+compiler's Composer package, `phaenon/phn`, required it up to its 0.3 line. The name changed when
+the language promised that the compiled output depends on nothing but PHP (design:
+[`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md) D24): no class,
+function or package the programmer did not write appears in it, so a project leaving Phaenon
+keeps a tree of plain PHP that stands alone. What was left of the runtime is a debugging aid a
+team opts into, and its name says so. `phaenon/phn` requires no package from 0.4 on and suggests
+this one (design: [`tooling.md`](https://github.com/phaenonlang/design/blob/main/tooling.md)
+T16). A project that registered the Monolog processor or the Sentry integration under the old
+name requires `phaenon/debug` instead; the namespace and the class names are the same. This
+package replaces `phaenon/runtime`, and `phaenon/phn` conflicts with it from 0.4 on, so Composer
+never installs the two, which declare the same classes, side by side.
 
-The package once held `Seq`, `Map` and `Str` as well, behind a method syntax on lists, maps and
-strings that Phaenon no longer has (design: [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md)
-D20): PHP's array functions, `mb_*`, `grapheme_*` and symfony/string do that work, chained with
-pipes.
+The rest of what the runtime held is gone, because the compiler writes no call into it:
+
+- `\Phaenon\Type`, the descriptor `is` and `as` compiled to on a type PHP cannot test itself
+  (`$x is list<int>`). Phaenon tests only what PHP tests in O(1) now, and such a test is an error
+  (design: [`generics.md`](https://github.com/phaenonlang/design/blob/main/generics.md) §11.4).
+  `$x is int` compiles to `\is_int($x)`, `$x is list` to `\is_array($x) && \array_is_list($x)`,
+  and a generic that needs its type parameter at runtime holds a `class<T>` value, a plain
+  class-name string, the way PHP code does today.
+- `\Phaenon\Bytes`, the conversions between Phaenon's `bytes` and text. A `bytes` value is a PHP
+  string at runtime, and the conversions are PHP's own: `$b as string` compiles to
+  `\mb_check_encoding($b, 'UTF-8') ? $b : throw new \ValueError('not valid UTF-8')`, and
+  `hex2bin()`, `bin2hex()`, `base64_decode()`, `base64_encode()` and `mb_scrub()` do the rest
+  (design: [`strings.md`](https://github.com/phaenonlang/design/blob/main/strings.md) §6).
+- `Seq`, `Map` and `Str`, behind a method syntax on lists, maps and strings that Phaenon no
+  longer has (design: [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md)
+  D20): PHP's array functions, `mb_*`, `grapheme_*` and symfony/string do that work, chained with
+  pipes.
 
 ## `Phaenon\Debug` — source positions in production
 

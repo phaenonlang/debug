@@ -6,7 +6,7 @@
          failOnWarning="true"
          failOnDeprecation="true">
     <testsuites>
-        <testsuite name="runtime">
+        <testsuite name="debug">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
