@@ -7,9 +7,8 @@ reads it and points logged exceptions and Sentry events at `.phn` source positio
 paths: compiled code never calls this package, and a project that does not register its
 integrations runs the same without it.
 
-Install: `composer require phaenon/debug`, at the minor version of the compiler that builds the
-project (`phaenon/phn` 0.4 suggests `phaenon/debug` 0.4.*). The two are released in lockstep until
-1.0, because this package reads the line map the compiler writes.
+Install: `composer require phaenon/debug`. It reads version 1 of the line map format, the one the
+compiler writes, whichever release of the compiler wrote it.
 
 ## Requirements
 
