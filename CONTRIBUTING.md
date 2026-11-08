@@ -7,8 +7,7 @@ reported privately: see [SECURITY.md](SECURITY.md).
 
 ## Where a change goes
 
-Most of `src/` is generated. `src/Bytes.php` and everything under `src/Debug/` are compiled by
-the Phaenon compiler from its own sources,
+All of `src/` is generated: it is compiled by the Phaenon compiler from its own sources,
 [`stdlib/runtime/`](https://github.com/phaenonlang/phaenon/tree/main/stdlib/runtime) in the
 compiler repository, with `phn stdlib --out src`, and the compiler reads those `.phn` files as
 its declaration of this API. A change to these files, a fix included, is therefore a pull
@@ -16,16 +15,14 @@ request to the compiler that changes the `.phn` source; the files here are regen
 An edit to a generated file here would be undone by the next regeneration, and the compiler's
 test suite fails while the two disagree.
 
-- `src/Type.php` is written by hand here. The compiler keeps a copy of its declaration,
-  `stdlib/runtime/Type.php`, so a change to its API is made in both repositories.
 - `tests/` is edited here. A bug found from this side can come as a test here, skipped with a
   note that names the bug, until the source is fixed.
 - `tests/Debug/vectors.json` is a copy of the compiler's
   `internal/linemap/testdata/vectors.json`, the reference every line-map reader is tested
   against: it is refreshed by copying, never edited here.
 
-The compiler emits calls to this API, so renaming or removing a public method breaks compiled
-code: it is a breaking change.
+Code written in Phaenon calls this API by name, so renaming or removing a public method breaks
+it: it is a breaking change.
 
 ## Running the tests
 

@@ -1,16 +1,12 @@
 # phaenon/runtime
 
-The runtime half of [Phaenon](https://phaenon.dev), a typed dialect of PHP that compiles to
-PHP. Compiled code depends on this package in one place: **`is` / `as` on a structural type**,
-which PHP cannot test on its own. `$x is list<int>` compiles to
-`\Phaenon\Type::list(\Phaenon\Type::int())->check($x)`, and `$x as map<string, int>` to the
-matching `->assert($x)`.
+Runtime support for [Phaenon](https://phaenon.dev), a typed dialect of PHP that compiles to PHP.
+The compiler introduces no call into this package: `is` and `as` compile to PHP's own tests —
+`$x is int` to `\is_int($x)`, `$x is list` to `\is_array($x) && \array_is_list($x)` — and a
+generic that needs its type parameter at runtime holds a `class<T>` value, a plain class-name
+string, the way PHP code does today.
 
-Everything else compiles to plain PHP with no dependency on this package. Class types need no
-descriptor: `$x is User` is `instanceof`, and a generic that needs its type parameter at runtime
-holds a `class<T>` value — a plain class-name string — the way PHP code does today.
-
-Two more parts are called by name, never introduced by the compiler:
+Its two parts are called by name:
 
 - **`\Phaenon\Bytes`**, the checked conversions between Phaenon's `bytes` and text
   ([below](#phaenonbytes)).
@@ -28,31 +24,10 @@ PHP 8.3 or later with `ext-mbstring`, which `Bytes::text()` and `Bytes::textLoss
 `Phaenon\Debug` loads only when the application registers it, which it does only with its
 library installed.
 
-## `\Phaenon\Type`
-
-An immutable, interned type descriptor:
-
-```php
-use Phaenon\Type;
-
-$t = Type::list(Type::int());        // 'list<int>'
-$t->check([1, 2]);                   // true — deep: every element is tested
-$t->assert($value);                  // returns $value, or throws TypeError("Expected list<int>, got string")
-$t->orNull($value);                  // the `as?` form
-
-$u = Type::of(User::class);          // a class type, as an element of a structural type
-Type::list($u)->check($users);       // every element is a User
-$u->className();                     // User::class
-```
-
-Constructors: `of`, `int`, `float`, `string`, `bool`, `null`, `mixed`, `object`, `array`,
-`iterable`, `callable`, `resource`, `list`, `map`, `nullable`, `union`, `intersection`,
-`literal`, `classString`. Queries: `check`, `assert`, `orNull`, `className`, `name`, `equals`,
-`isSubtypeOf`.
-
-Descriptors are interned (`Type::int() === Type::int()`), so building one in a hot path
-costs a lookup, not an allocation. Container checks are O(n) by design: the cost of a deep
-check is visible at the call site that asked for it.
+The package once held `\Phaenon\Type` as well, the descriptor `is` and `as` compiled to on a
+type PHP cannot test itself (`$x is list<int>`). Phaenon tests only what PHP tests in O(1) now,
+and such a test is an error (design: [`generics.md`](https://github.com/phaenonlang/design/blob/main/generics.md)
+§11.4).
 
 ## `\Phaenon\Bytes`
 
@@ -189,15 +164,14 @@ and, from the `.phn`, the code around them.
 
 ## Generated code
 
-`src/Bytes.php` and everything under `src/Debug/` are **compiled by the Phaenon compiler** from
-its own stdlib sources, `stdlib/runtime/**/*.phn` in the compiler repository, with `phn stdlib
---out src`. Those `.phn` files are the one source: the compiler reads them as the declaration of
-this API, and the compiled PHP is what this package ships. Do not edit these files; change the `.phn` source and regenerate. The compiler checks the
-`Debug` integrations against its own declaration of the Monolog and Sentry API they use; PHPStan
-here checks the compiled code against the real libraries. The compiler's test suite checks that the
-copies here are fresh, and `phn stdlib --out src --check` does the same from the command line.
-
-`src/Type.php` is written by hand; the compiler holds a copy of its declaration.
+Everything in `src/` is **compiled by the Phaenon compiler** from its own stdlib sources,
+`stdlib/runtime/**/*.phn` in the compiler repository, with `phn stdlib --out src`. Those `.phn`
+files are the one source: the compiler reads them as the declaration of this API, and the
+compiled PHP is what this package ships. Do not edit these files; change the `.phn` source and
+regenerate. The compiler checks the `Debug` integrations against its own declaration of the
+Monolog and Sentry API they use; PHPStan here checks the compiled code against the real
+libraries. The compiler's test suite checks that the copies here are fresh, and
+`phn stdlib --out src --check` does the same from the command line.
 
 ## Development
 
