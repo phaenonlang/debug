@@ -1,6 +1,6 @@
-# Contributing to phaenon/runtime
+# Contributing to phaenon/debug
 
-Issues about this package go to [its tracker](https://github.com/phaenonlang/runtime/issues);
+Issues about this package go to [its tracker](https://github.com/phaenonlang/debug/issues);
 issues about the compiler or the language, to
 [phaenonlang/phaenon](https://github.com/phaenonlang/phaenon/issues). A vulnerability is
 reported privately: see [SECURITY.md](SECURITY.md).
@@ -21,8 +21,8 @@ test suite fails while the two disagree.
   `internal/linemap/testdata/vectors.json`, the reference every line-map reader is tested
   against: it is refreshed by copying, never edited here.
 
-Code written in Phaenon calls this API by name, so renaming or removing a public method breaks
-it: it is a breaking change.
+Applications call this API by name, so renaming or removing a public method breaks them: it is
+a breaking change.
 
 ## Running the tests
 

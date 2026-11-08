@@ -1,12 +1,13 @@
-# phaenon/runtime — agent guide
+# phaenon/debug — agent guide
 
-The Composer package `phaenon/runtime`, what code written in Phaenon calls by name at runtime.
-The compiler introduces no call into it: `is` and `as` compile to PHP's own tests, and
-`\Phaenon\Type`, the descriptor they once compiled to, is gone (design: `../design/generics.md`
-§11.4, `../design/roadmap.md` D23 and D24). So is `\Phaenon\Bytes`: `$b as string` is the
-checked conversion of `bytes` to text, lowered to `mb_check_encoding()`, and PHP's own functions
-are the rest (`../design/strings.md` §6). `Seq`, `Map` and `Str` were removed with the method
-syntax (`../design/roadmap.md` D20).
+The Composer package `phaenon/debug`: the reader of the line map every compiled `.phn` file ends
+with, and the Monolog and Sentry integrations built on it that point production errors at `.phn`
+positions. A project opts into it; compiled code never calls it, because the output depends on
+nothing but PHP (design: `../design/roadmap.md` D24, `../design/line-map.md` L6). Until 0.3 it
+was `phaenon/runtime` (`../design/tooling.md` T16), which held `\Phaenon\Type`,
+`\Phaenon\Bytes`, `Seq`, `Map` and `Str` as well; `is` and `as` compile to PHP's own tests now,
+`bytes` to PHP's own functions, and the method syntax is gone (`../design/generics.md` §11.4,
+`../design/strings.md` §6, `../design/roadmap.md` D20).
 
 - `\Phaenon\Debug`, used on error paths only (design: `../design/line-map.md` §3 and §4.3):
   `LineMap` reads the line map at the end of a compiled file; `ThrowableRewriter` points a
@@ -28,7 +29,7 @@ composer stan        # PHPStan at level max over src/ and tests/
 - **`src/` is generated: never edit it.** The compiler compiles it from its own
   `../phaenon/stdlib/runtime/**/*.phn` with `phn stdlib --out src` (run in this repository),
   and reads those `.phn` files as its declaration of the API. A wrong behaviour is fixed in the
-  `.phn` source, then regenerated; the compiler's test suite (`TestRuntimePackageFresh` in
+  `.phn` source, then regenerated; the compiler's test suite (`TestDebugPackageFresh` in
   `internal/emit`) fails while the copies here are stale, and `phn stdlib --out src --check`
   reports the same. A bug found from this side is recorded as a skipped test naming it until the
   source is fixed.
@@ -40,10 +41,11 @@ composer stan        # PHPStan at level max over src/ and tests/
 
 ## Rules
 
-- Code written in Phaenon calls this API by name, so renaming or removing a public method breaks
-  it.
-- `composer.json` requires PHP 8.3 and no extension. Raise the floor only when generated code
-  needs it, and say so in the README.
+- Applications call this API by name (their configuration registers the processor and the
+  integration; another error reporter calls `ThrowableRewriter`), so renaming or removing a
+  public method breaks them.
+- `composer.json` requires PHP 8.3 and no extension. Raise the floor only when the compiled
+  sources need it, and say so in the README.
 - Tests: one final test class per unit in `tests/`, PHPUnit attributes, `self::assert…`; edge
   cases (empty input, null returns, copies left unchanged, the exceptions the docblocks
   promise) are part of the contract. PHPStan runs on the tests too; the identifiers relaxed

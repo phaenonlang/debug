@@ -1,19 +1,21 @@
 {
-    "name": "phaenon/runtime",
-    "description": "Runtime support for code written in Phaenon: the line map reader that points Monolog records and Sentry events at .phn source positions",
+    "name": "phaenon/debug",
+    "description": "The line map reader and the Monolog and Sentry integrations that point production errors at the .phn source positions of code written in Phaenon: opt-in, never called by compiled code",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "phaenon",
-        "runtime",
+        "debug",
+        "line map",
         "source map",
+        "stack trace",
         "monolog",
         "sentry"
     ],
     "homepage": "https://phaenon.dev",
     "support": {
-        "issues": "https://github.com/phaenonlang/runtime/issues",
-        "source": "https://github.com/phaenonlang/runtime",
+        "issues": "https://github.com/phaenonlang/debug/issues",
+        "source": "https://github.com/phaenonlang/debug",
         "docs": "https://phaenon.dev"
     },
     "require": {
