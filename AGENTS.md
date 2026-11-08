@@ -3,12 +3,11 @@
 The Composer package `phaenon/runtime`, what code written in Phaenon calls by name at runtime.
 The compiler introduces no call into it: `is` and `as` compile to PHP's own tests, and
 `\Phaenon\Type`, the descriptor they once compiled to, is gone (design: `../design/generics.md`
-§11.4, `../design/roadmap.md` D23 and D24).
+§11.4, `../design/roadmap.md` D23 and D24). So is `\Phaenon\Bytes`: `$b as string` is the
+checked conversion of `bytes` to text, lowered to `mb_check_encoding()`, and PHP's own functions
+are the rest (`../design/strings.md` §6). `Seq`, `Map` and `Str` were removed with the method
+syntax (`../design/roadmap.md` D20).
 
-- `\Phaenon\Bytes`, the checked conversions between `bytes` and text: `text`, `textLossy`,
-  `fromHex`, `fromBase64`, `hex`, `base64` (design: `../design/strings.md` §2 and its D20 status
-  note). A `bytes` value is a PHP string at runtime; PHP's own functions do the rest. `Seq`,
-  `Map` and `Str` were removed with the method syntax (`../design/roadmap.md` D20).
 - `\Phaenon\Debug`, used on error paths only (design: `../design/line-map.md` §3 and §4.3):
   `LineMap` reads the line map at the end of a compiled file; `ThrowableRewriter` points a
   throwable at its `.phn` positions in place; `Monolog\LineMapProcessor` and
@@ -43,8 +42,8 @@ composer stan        # PHPStan at level max over src/ and tests/
 
 - Code written in Phaenon calls this API by name, so renaming or removing a public method breaks
   it.
-- `composer.json` requires PHP 8.3 and `ext-mbstring` (`Bytes::text()`, `textLossy()`). Raise
-  the floor only when generated code needs it, and say so in the README.
+- `composer.json` requires PHP 8.3 and no extension. Raise the floor only when generated code
+  needs it, and say so in the README.
 - Tests: one final test class per unit in `tests/`, PHPUnit attributes, `self::assert…`; edge
   cases (empty input, null returns, copies left unchanged, the exceptions the docblocks
   promise) are part of the contract. PHPStan runs on the tests too; the identifiers relaxed
