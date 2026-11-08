@@ -1,10 +1,10 @@
 # phaenon/runtime — agent guide
 
-The Composer package `phaenon/runtime`, what code compiled from Phaenon needs at runtime:
+The Composer package `phaenon/runtime`, what code written in Phaenon calls by name at runtime.
+The compiler introduces no call into it: `is` and `as` compile to PHP's own tests, and
+`\Phaenon\Type`, the descriptor they once compiled to, is gone (design: `../design/generics.md`
+§11.4, `../design/roadmap.md` D23 and D24).
 
-- `\Phaenon\Type`, the immutable, interned type descriptor behind `is` / `as` on structural
-  types (design: `../design/generics.md` §5.5, §11 and §11.2 — `reified` is gone, the
-  descriptor never appears in a signature).
 - `\Phaenon\Bytes`, the checked conversions between `bytes` and text: `text`, `textLossy`,
   `fromHex`, `fromBase64`, `hex`, `base64` (design: `../design/strings.md` §2 and its D20 status
   note). A `bytes` value is a PHP string at runtime; PHP's own functions do the rest. `Seq`,
@@ -24,17 +24,15 @@ composer test        # PHPUnit 12
 composer stan        # PHPStan at level max over src/ and tests/
 ```
 
-## Two directions of flow
+## Where the files come from
 
-- **`src/Type.php` is hand-kept here.** The compiler's checker reads a copy of its declaration,
-  `../phaenon/stdlib/runtime/Type.php`: change both together.
-- **`src/Bytes.php` and `src/Debug/` are generated: never edit them.** The compiler compiles
-  them from its own `../phaenon/stdlib/runtime/**/*.phn` with
-  `phn stdlib --out src` (run in this repository), and reads those `.phn` files as its
-  declaration of the API. A wrong behaviour is fixed in the `.phn` source, then regenerated;
-  the compiler's test suite (`TestRuntimePackageFresh` in `internal/emit`) fails while the
-  copies here are stale, and `phn stdlib --out src --check` reports the same. A bug found from
-  this side is recorded as a skipped test naming it until the source is fixed.
+- **`src/` is generated: never edit it.** The compiler compiles it from its own
+  `../phaenon/stdlib/runtime/**/*.phn` with `phn stdlib --out src` (run in this repository),
+  and reads those `.phn` files as its declaration of the API. A wrong behaviour is fixed in the
+  `.phn` source, then regenerated; the compiler's test suite (`TestRuntimePackageFresh` in
+  `internal/emit`) fails while the copies here are stale, and `phn stdlib --out src --check`
+  reports the same. A bug found from this side is recorded as a skipped test naming it until the
+  source is fixed.
 - **`tests/Debug/vectors.json` is a verbatim copy** of the compiler's
   `internal/linemap/testdata/vectors.json`, the reference every line-map reader is tested
   against; the compiler's freshness test compares the copies. Refresh it by copying, never edit
@@ -43,8 +41,8 @@ composer stan        # PHPStan at level max over src/ and tests/
 
 ## Rules
 
-- The compiler emits calls to this API (`../phaenon/internal/emit/`), so renaming or removing a
-  public method breaks compiled code.
+- Code written in Phaenon calls this API by name, so renaming or removing a public method breaks
+  it.
 - `composer.json` requires PHP 8.3 and `ext-mbstring` (`Bytes::text()`, `textLossy()`). Raise
   the floor only when generated code needs it, and say so in the README.
 - Tests: one final test class per unit in `tests/`, PHPUnit attributes, `self::assert…`; edge
