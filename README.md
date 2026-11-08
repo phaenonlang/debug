@@ -6,51 +6,29 @@ The compiler introduces no call into this package: `is` and `as` compile to PHP'
 generic that needs its type parameter at runtime holds a `class<T>` value, a plain class-name
 string, the way PHP code does today.
 
-Its two parts are called by name:
-
-- **`\Phaenon\Bytes`**, the checked conversions between Phaenon's `bytes` and text
-  ([below](#phaenonbytes)).
-- **`Phaenon\Debug`**, opt-in and used only on error paths: it reads the line map at the end of
-  every compiled file and points logged exceptions and Sentry events at `.phn` source positions
-  ([below](#phaenondebug--source-positions-in-production)).
+What it holds is called by name: **`Phaenon\Debug`**, opt-in and used only on error paths. It
+reads the line map at the end of every compiled file and points logged exceptions and Sentry
+events at `.phn` source positions ([below](#phaenondebug--source-positions-in-production)).
 
 Install: `composer require phaenon/runtime` (the compiler's package, `phaenon/phn`, requires it
 already).
 
 ## Requirements
 
-PHP 8.3 or later with `ext-mbstring`, which `Bytes::text()` and `Bytes::textLossy()` use.
-`monolog/monolog` 3 and `sentry/sentry` 4 are suggested, not required: each integration in
-`Phaenon\Debug` loads only when the application registers it, which it does only with its
-library installed.
+PHP 8.3 or later. `monolog/monolog` 3 and `sentry/sentry` 4 are suggested, not required: each
+integration in `Phaenon\Debug` loads only when the application registers it, which it does only
+with its library installed.
 
 The package once held `\Phaenon\Type` as well, the descriptor `is` and `as` compiled to on a
 type PHP cannot test itself (`$x is list<int>`). Phaenon tests only what PHP tests in O(1) now,
 and such a test is an error (design: [`generics.md`](https://github.com/phaenonlang/design/blob/main/generics.md)
 §11.4).
 
-## `\Phaenon\Bytes`
-
-Phaenon keeps binary data and text apart: `bytes` is a type of its own in Phaenon source and **a
-PHP string at runtime**, erased to `string` in the output. The `(bytes)` cast costs nothing, and
-PHP's own functions — `strlen()`, `substr()`, `.`, `hash_equals()`, `ord($b[$i])` — work on bytes
-as they do on strings. `Bytes` holds the conversions that check their input or spell the bytes
-out; `Bytes::text()` is the one that scans, because it validates UTF-8.
-
-```php
-use Phaenon\Bytes;
-
-Bytes::fromHex('48656c6c6f');                       // 'Hello'
-Bytes::hex("\x00\xFF");                             // '00ff'
-Bytes::base64(random_bytes(16), urlSafe: true);     // '-' and '_', no padding
-Bytes::fromBase64('SGVsbG8');                       // either alphabet, padding optional
-Bytes::text("h\xC3\xA9llo");                        // 'héllo'
-Bytes::text("\xFF");                                // throws \ValueError: not valid UTF-8
-Bytes::textLossy("a\xFFb");                         // "a\u{FFFD}b"
-```
-
-`fromHex`, `fromBase64`, `hex`, `base64`, `text`, `textLossy`. The class is plain PHP, so PHP
-code can call it too.
+It held `\Phaenon\Bytes` too, the conversions between Phaenon's `bytes` and text. A `bytes` value
+is a PHP string at runtime, and the conversions are PHP's own: `$b as string` compiles to
+`\mb_check_encoding($b, 'UTF-8') ? $b : throw new \ValueError('not valid UTF-8')`, and
+`hex2bin()`, `bin2hex()`, `base64_decode()`, `base64_encode()` and `mb_scrub()` do the rest
+(design: [`strings.md`](https://github.com/phaenonlang/design/blob/main/strings.md) §6).
 
 The package once held `Seq`, `Map` and `Str` as well, behind a method syntax on lists, maps and
 strings that Phaenon no longer has (design: [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md)

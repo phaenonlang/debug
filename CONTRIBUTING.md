@@ -26,7 +26,7 @@ it: it is a breaking change.
 
 ## Running the tests
 
-PHP 8.3 or later with `ext-mbstring`, and Composer:
+PHP 8.3 or later and Composer:
 
 ```sh
 composer install
