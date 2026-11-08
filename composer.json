@@ -21,6 +21,9 @@
     "require": {
         "php": ">=8.3"
     },
+    "replace": {
+        "phaenon/runtime": "self.version"
+    },
     "require-dev": {
         "monolog/monolog": "^3.0",
         "phpstan/phpstan": "^2.1",

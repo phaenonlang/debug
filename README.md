@@ -28,7 +28,9 @@ keeps a tree of plain PHP that stands alone. What was left of the runtime is a d
 team opts into, and its name says so. `phaenon/phn` requires no package from 0.4 on and suggests
 this one (design: [`tooling.md`](https://github.com/phaenonlang/design/blob/main/tooling.md)
 T16). A project that registered the Monolog processor or the Sentry integration under the old
-name requires `phaenon/debug` instead; the namespace and the class names are the same.
+name requires `phaenon/debug` instead; the namespace and the class names are the same. This
+package replaces `phaenon/runtime`, and `phaenon/phn` conflicts with it from 0.4 on, so Composer
+never installs the two, which declare the same classes, side by side.
 
 The rest of what the runtime held is gone, because the compiler writes no call into it:
 
