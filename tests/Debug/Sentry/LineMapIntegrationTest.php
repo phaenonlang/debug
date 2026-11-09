@@ -83,7 +83,7 @@ final class LineMapIntegrationTest extends TestCase
         self::assertSame("            throw new \\RuntimeException('greeting failed', 0, \$e);", $top->getContextLine());
         self::assertSame(['        try {', '            return $this->greet($name);', '        } catch (\InvalidArgumentException $e) {'], \array_slice($top->getPreContext(), -3));
         self::assertCount(5, $top->getPreContext());
-        self::assertSame(['        }', '    }', '', '    fun share(int $cakes, int $guests): int => intdiv($cakes, $guests);', '}'], $top->getPostContext());
+        self::assertSame(['        }', '    }', '', '    share(int $cakes, int $guests): int => intdiv($cakes, $guests);', '}'], $top->getPostContext());
     }
 
     #[Test]
