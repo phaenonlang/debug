@@ -33,17 +33,19 @@ never installs the two, which declare the same classes, side by side.
 
 The rest of what the runtime held is gone, because the compiler writes no call into it:
 
-- `\Phaenon\Type`, the descriptor `is` and `as` compiled to on a type PHP cannot test itself
-  (`$x is list<int>`). Phaenon tests only what PHP tests in O(1) now, and such a test is an error
-  (design: [`generics.md`](https://github.com/phaenonlang/design/blob/main/generics.md) §11.4).
-  `$x is int` compiles to `\is_int($x)`, `$x is list` to `\is_array($x) && \array_is_list($x)`,
-  and a generic that needs its type parameter at runtime holds a `class<T>` value, a plain
-  class-name string, the way PHP code does today.
+- `\Phaenon\Type`, the descriptor the type-test operators of the time compiled to on a type PHP
+  cannot test itself, such as a list of ints. Phaenon has no type-test operator now: a type test
+  is PHP's own, `is_int($x)`, `$x instanceof Foo`, `is_array($x) && array_is_list($x)`, and the
+  checker narrows through it as PHPStan does (design:
+  [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md) D26). A generic
+  that needs its type parameter at runtime holds a `class<T>` value, a plain class-name string,
+  the way PHP code does today.
 - `\Phaenon\Bytes`, the conversions between Phaenon's `bytes` and text. A `bytes` value is a PHP
-  string at runtime, and the conversions are PHP's own: `$b as string` compiles to
-  `\mb_check_encoding($b, 'UTF-8') ? $b : throw new \ValueError('not valid UTF-8')`, and
-  `hex2bin()`, `bin2hex()`, `base64_decode()`, `base64_encode()` and `mb_scrub()` do the rest
-  (design: [`strings.md`](https://github.com/phaenonlang/design/blob/main/strings.md) §6).
+  string at runtime, and the conversions are PHP's own: the checked one is
+  `mb_check_encoding($b, 'UTF-8') ? $b : throw new \ValueError('not valid UTF-8')`, through which
+  the checker reads the value as text, and `hex2bin()`, `bin2hex()`, `base64_decode()`,
+  `base64_encode()` and `mb_scrub()` do the rest (design:
+  [`strings.md`](https://github.com/phaenonlang/design/blob/main/strings.md) §6).
 - `Seq`, `Map` and `Str`, behind a method syntax on lists, maps and strings that Phaenon no
   longer has (design: [`roadmap.md`](https://github.com/phaenonlang/design/blob/main/roadmap.md)
   D20): PHP's array functions, `mb_*`, `grapheme_*` and symfony/string do that work, chained with

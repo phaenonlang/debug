@@ -5,9 +5,9 @@ with, and the Monolog and Sentry integrations built on it that point production 
 positions. A project opts into it; compiled code never calls it, because the output depends on
 nothing but PHP (design: `../design/roadmap.md` D24, `../design/line-map.md` L6). Until 0.3 it
 was `phaenon/runtime` (`../design/tooling.md` T16), which held `\Phaenon\Type`,
-`\Phaenon\Bytes`, `Seq`, `Map` and `Str` as well; `is` and `as` compile to PHP's own tests now,
-`bytes` to PHP's own functions, and the method syntax is gone (`../design/generics.md` §11.4,
-`../design/strings.md` §6, `../design/roadmap.md` D20).
+`\Phaenon\Bytes`, `Seq`, `Map` and `Str` as well; a type test is PHP's own now, `bytes` is
+converted by PHP's own functions, and the method syntax is gone (`../design/roadmap.md` D26 and
+D20, `../design/strings.md` §6).
 
 - `\Phaenon\Debug`, used on error paths only (design: `../design/line-map.md` §3 and §4.3):
   `LineMap` reads the line map at the end of a compiled file; `ThrowableRewriter` points a
