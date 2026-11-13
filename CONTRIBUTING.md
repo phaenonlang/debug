@@ -38,6 +38,11 @@ CI runs both on PHP 8.5 for every pull request.
 
 ## Pull requests
 
+A pull request targets `main`, never the branch of another open pull request: CI and the PR
+semantics check run only on pull requests into `main`, and GitHub closes a stacked pull request
+when the branch under it is deleted. A change that depends on an unmerged one goes into the same
+pull request, or waits for its merge.
+
 A pull request is squash-merged: its title becomes the commit on `main`, and its commits'
 messages that commit's body. So a pull request needs:
 
